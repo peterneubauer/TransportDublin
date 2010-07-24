@@ -84,6 +84,7 @@ public class SetupTimetableConnectionsStep3 {
 
 	public static void main(String[] args) {
 
+		SetupTimetableConnectionsStep3 SetupTimetableConnectionsStep3= new SetupTimetableConnectionsStep3();
 		graphDb.shutdown();
 	}
 

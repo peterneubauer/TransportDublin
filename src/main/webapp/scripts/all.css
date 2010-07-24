@@ -1,0 +1,122 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	font:	12px/1.2 Verdana, Arial, Helvetica, sans-serif;
+	background:#ddd;
+	padding:0px;
+	margin:0px;
+	}
+	
+a {
+	text-decoration:none;
+	font-weight:bold;
+	color:#c00;
+	}
+	
+pre {
+	font-size:11px;
+	color:blue;
+	}
+	
+.greek {
+	color:#999;
+	}
+	
+ol {
+	margin-right:40px;
+	}
+li {
+	margin-bottom:10px;
+	}
+	
+	
+	/* layout*/
+	
+	body {
+	text-align:center;
+}
+#frame {
+	width:1000px;
+	margin-right:auto;
+	margin-left:auto;
+	margin-top:10px;
+	padding:0px;
+	text-align:left;
+}
+#contentleft {
+	width:100px;
+	padding:0px;
+	float:left;
+	background:#fff;
+}
+#contentcenter {
+	width:700px;
+	padding:0px;
+	float:left;
+	background:#eee;
+}
+#contentright {
+	width:200px;
+	padding:0px;
+	float:left;
+	background:#fff;
+}
+#contentheader {
+	background:#fff
+}
+p, h1, h3,pre {
+	margin:0px 10px 10px 10px;
+}
+h1 {
+	font-size:14px;
+	padding-top:10px;
+}
+/*
+#contentheader h1 {
+	font-size:14px;
+	padding:10px;
+	margin:0px;
+	padding-left:400px;
+}*/
+
+#contentheader h1
+{
+font-family: Helvetica,Arial,Sans-serif;
+font-style: normal;
+font-variant: normal;
+font-weight: bold;
+font-size: 30px;
+line-height: 30px;
+font-size-adjust: none;
+font-stretch: normal;
+-x-system-font: none;
+text-align: center;
+color: #eeeeee;
+text-shadow: #333333;
+
+}
+
+
+h3 {
+	font-size:10px;
+	padding-top:5px;
+}
+#contentheader h3 {
+	font-size:10px;
+	padding:10px;
+	margin:0px;
+	padding-left:300px;
+}
+#contentright p {
+	font-size:10px
+}
+fieldset { border:0px solid green }
+
+#map { float:left; width:700px; height:600px; }
+	
+	
+	#list { float:left; width:200px; background:#eee; list-style:none; padding:0; }
+#list li { padding:10px; }
+#list li:hover { background:#555; color:#fff; cursor:pointer; cursor:hand; }
+	

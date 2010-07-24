@@ -1,0 +1,104 @@
+body{
+			background: rgb(229,222,175);
+			padding: 0px;
+			margin: 0px;
+			overflow-x: hidden;	
+		}
+		
+		#control{
+			background: #111;
+			padding: 10px;
+			text-align: center;
+			margin-bottom: 60px;
+			-moz-box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+  			-webkit-box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+		}
+		#control a{
+			color: rgba(229,222,175,0.5);
+			text-decoration: none;
+			margin: 10px;
+			font-size: 0.75em;
+			letter-spacing: 0.1em;
+			font-family: Georgia;
+		}
+		#control a:hover{
+			color: rgba(229,222,175,1);
+		}
+		
+		#content{
+			width: 500px;
+			margin: 0px auto;
+			font-size: 14px;
+		}
+
+
+
+
+/* LEVEL 6 */
+		
+		.typography h1{
+		
+			color: rgb(142,11,0);
+
+			font-family: Georgia;
+			font-size: 2.5em;
+			letter-spacing: 0.1em;
+			text-shadow: 1px 1px 1px rgba(255,255,255,0.6);
+		}
+		.typography h1 span{
+			display: block;
+			margin-top: 0.5em;
+			font-family: Verdana;
+			font-size: 0.6em;
+			font-weight: normal;
+			letter-spacing: 0em;
+			text-shadow: none;
+		}
+		.typography .meta{
+			font-family: Georgia;
+			color: rgba(69,54,37,0.6);
+			font-size: 0.85em;
+			font-style: italic;
+			letter-spacing: 0.25em;
+			border-bottom: 1px solid rgba(69,54,37,0.2);
+			padding-bottom: 0.5em;
+		}
+		.typography .meta span{
+			text-transform: capitalize;
+			font-style: normal;
+			color: rgba(69,54,37,0.8);
+		}
+		.typography .body p{
+			font-family: Verdana;
+			-moz-column-count: 2;
+			-moz-column-gap: 1em;
+			-webkit-column-count: 2;
+			-webkit-column-gap: 1em;
+			column-count: 2;
+			column-gap: 1em;
+			line-height: 1.5em;
+			color: rgb(69,54,37);
+		}
+		.typography .body p:first-child{
+			font-size: 1.25em;
+			font-family: Georgia;
+			font-style: italic;
+			-moz-column-count: 1;
+			-webkit-column-count: 1;
+			column-count: 1;
+			letter-spacing: 0.1em;
+		}
+		.typography .body p:first-child:first-line{
+			font-weight: bold;
+		}
+		.typography date{
+			font-family: Georgia;
+			color: rgba(69,54,37,0.6);
+			font-size: 0.75em;
+			font-style: italic;
+			letter-spacing: 0.25em;
+			border-top: 1px solid rgba(69,54,37,0.2);
+			display: block;
+			padding-top: 0.5em;
+			margin-top: 2em;
+		}

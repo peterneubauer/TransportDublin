@@ -95,7 +95,7 @@ public class SetupDirections {
 						String stopName = waypoint.getStopname();
 						String routeId = waypoint.getRouteid();
 						String time = stopTime.getTime();
-						Marker location = new Marker(stopTime.getStopID(),
+						Marker location = new Marker(routeId,
 								time, stopName, latlng);
 						System.out.println("*location " + location);
 						locationList.add(location);

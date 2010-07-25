@@ -42,8 +42,7 @@ public class SetupGraph {
 	public static HashMap<String, Double> getNeighboursWithin(double lat,
 			double lng, double distance) {
 
-		SpatialDatabaseService spatialService = new SpatialDatabaseService(
-				graphDbService);
+		SpatialDatabaseService spatialService = new SpatialDatabaseService(	graphDbService);
 		Layer layer = spatialService.getLayer(LAYER_NAME);
 		SpatialIndexReader reader = layer.getIndex();
 		Point refPoint = layer.getGeometryFactory().createPoint(

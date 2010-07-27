@@ -4,6 +4,8 @@ TransportDublin.ie Beta - Public Transport Route Planner using Neo4j
 Installation
 ------------
 
+![Routing](http://img838.imageshack.us/img838/8676/websitescreenshot.jpg "Routing")
+
 To run it, do:
 
 1. Install http://maven.apache.org

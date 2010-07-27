@@ -16,6 +16,6 @@ To run it, do:
 
     mvn jetty:run
   
-5. Browse the application at http://localhost:8080/transportdublin/routeplanner
+5. Browse the application at [http://localhost:8080/transportdublin/routeplanner](http://localhost:8080/transportdublin/routeplanner)
 
-More Info: [http://wiki.github.com/paddydub/TransportDublin/]
+More Info on the [wiki page](http://wiki.github.com/paddydub/TransportDublin/ "Documentation")

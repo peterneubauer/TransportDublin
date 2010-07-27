@@ -1,7 +1,8 @@
-=====================================
-TransportDublin.ie Beta
-Public Transport Route Planner using Neo4j
-=====================================
+TransportDublin.ie Beta - Public Transport Route Planner using Neo4j
+====================================================================
+
+Installation
+------------
 
 To run it, do:
 
@@ -9,12 +10,12 @@ To run it, do:
 2. Clone this project
 3. Import the data:
 
-  mvn -P import install
+    mvn -P import install
   
 4. Run the server:
 
-  mvn jetty:run
+    mvn jetty:run
   
 5. Browse the application at http://localhost:8080/transportdublin/routeplanner
 
-More Info: http://wiki.github.com/paddydub/TransportDublin/
+More Info: [http://wiki.github.com/paddydub/TransportDublin/]

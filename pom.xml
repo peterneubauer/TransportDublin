@@ -51,7 +51,35 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			</plugin>
 		</plugins>
 	</build>
-
+	<profiles>
+		<profile>
+			<id>import</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<id>build-config-files</id>
+								<configuration>
+									<tasks>
+										<get src="http://www.transportdublin.ie/neo4j/neo4j-db.zip"
+											dest="data/neo4j-db.zip" verbose="true" usetimestamp="true" />
+										<unzip src="data/neo4j-db.zip" dest="data/" />
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<properties>
 		<org.springframework.version>3.0.0.RELEASE</org.springframework.version>
@@ -85,10 +113,8 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			</releases>
 		</repository>
 
-		<!--
-			For JSR 303 and Hibernate Validator only - Encourage JBoss to publish
-			these artifacts to Maven Central!
-		-->
+		<!-- For JSR 303 and Hibernate Validator only - Encourage JBoss to publish 
+			these artifacts to Maven Central! -->
 		<repository>
 			<id>org.jboss.repository.maven</id>
 			<url>http://repository.jboss.org/maven2</url>
@@ -146,7 +172,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<artifactId>neo4j-spatial</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-	
+
 
 
 		<!-- Mysql -->
@@ -174,7 +200,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<version>2.6.3</version>
 		</dependency>
 
-		<!--  Spring -->
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -255,7 +281,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!--  JSR 303 with Hibernate Validator -->
+		<!-- JSR 303 with Hibernate Validator -->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -267,7 +293,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<version>4.0.2.GA</version>
 		</dependency>
 
-		<!--  Joda Time -->
+		<!-- Joda Time -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
@@ -282,7 +308,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<version>1.4.2</version>
 		</dependency>
 
-		<!--  URL Rewrite -->
+		<!-- URL Rewrite -->
 		<dependency>
 			<groupId>org.tuckey</groupId>
 			<artifactId>urlrewritefilter</artifactId>
@@ -340,7 +366,7 @@ Built with a CSS3 layout and with a JQuery directions panel</description>
 			<version>2.0.beta1</version>
 		</dependency>
 
-		<!--  Gson: Java to Json conversion -->
+		<!-- Gson: Java to Json conversion -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

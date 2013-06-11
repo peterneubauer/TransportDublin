@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 
+import ie.transportdublin.mvc.ajax.pathfinder.SetupDirections;
+import org.neo4j.gis.spatial.EditableLayer;
 import org.neo4j.gis.spatial.Layer;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -31,7 +33,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class ImportSpatialStopDataStep2 {
 
 	private static final String DB_PATH = "data/neo4j-db";
-	private static final String LAYER_NAME = "stops_layer";
+	public static final String LAYER_NAME = "stops_layer";
 
 	public static void main(String[] args) throws Exception {
 		String citiesPath = "resources/data/stopsListForNeo4jSpatial.txt";
@@ -42,7 +44,7 @@ public class ImportSpatialStopDataStep2 {
 
 			Transaction tx = database.beginTx();
 			try {
-				spatialService.createLayer(LAYER_NAME);
+				spatialService.getOrCreateEditableLayer(LAYER_NAME);
 				tx.success();
 			} finally {
 				tx.finish();
@@ -61,7 +63,7 @@ public class ImportSpatialStopDataStep2 {
 				// while (line != null && !neededCountryFinished) {
 				tx = database.beginTx();
 				try {
-					Layer layer = spatialService.getLayer(LAYER_NAME);
+					EditableLayer layer = spatialService.getOrCreateEditableLayer(LAYER_NAME);
 					com.vividsolutions.jts.geom.GeometryFactory gf = layer
 							.getGeometryFactory();
 

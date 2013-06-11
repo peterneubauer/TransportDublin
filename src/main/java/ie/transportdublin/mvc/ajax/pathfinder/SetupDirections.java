@@ -14,24 +14,25 @@ import java.util.LinkedList;
 
 import org.neo4j.graphalgo.WeightedPath;
 import org.neo4j.graphdb.Node;
-import org.neo4j.index.IndexService;
+import org.neo4j.graphdb.index.IndexManager;
 
 import com.google.gson.Gson;
 
 
 public class SetupDirections {
 
-	private IndexService indexService;
+    public static final String LAYER1 = "layer1";
+    private IndexManager indexService;
 	Polylines polylines;
 	Markers markers;
 	WeightedPath path;
 
 	/**
 	 * Sets up a Directions Json which is used to populate the route on the map
-	 * @param path
-	 * @param indexService
-	 */
-	public SetupDirections(WeightedPath path, IndexService indexService) {
+     * @param path
+     * @param indexService
+     */
+	public SetupDirections(WeightedPath path, IndexManager indexService) {
 
 		this.path = path;
 		this.indexService = indexService;
@@ -86,8 +87,8 @@ public class SetupDirections {
 					LatLng latlng = new LatLng(stopTime.getCoordinates()
 							.getLatitude(), stopTime.getCoordinates()
 							.getLongitude());
-					Node stop = indexService.getSingleNode(Waypoint.STOPID,
-							stopTime.getStopID());
+					Node stop = indexService.forNodes(LAYER1).get(Waypoint.STOPID,
+							stopTime.getStopID()).getSingle();
 					// if is null or is star or end node
 					if (stop != null) {
 						Waypoint waypoint = new Waypoint(stop);

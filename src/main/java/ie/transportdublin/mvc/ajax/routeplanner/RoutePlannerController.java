@@ -7,7 +7,6 @@ import javax.validation.Validator;
 
 import org.neo4j.graphalgo.WeightedPath;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.index.IndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,9 +30,6 @@ public class RoutePlannerController {
 	@Autowired
 	private GraphDatabaseService graphDbService;
 
-	@Autowired
-	private IndexService indexService;
-
 	public RoutePlannerController() {
 		super();
 	}
@@ -51,9 +47,9 @@ public class RoutePlannerController {
 	
 		RoutePlanner routePlanner = new RoutePlanner(lat1, lng1, lat2, lng2);
 		GraphPathFinder pathfinder = new GraphPathFinder(graphDbService,
-				indexService);
+				graphDbService.index());
 		WeightedPath path = pathfinder.setupStartAndEndPoints(routePlanner);
-		SetupDirections directions = new SetupDirections(path, indexService);
+		SetupDirections directions = new SetupDirections(path, graphDbService.index());
 		String json = directions.getJson();
 		return json;
 	}

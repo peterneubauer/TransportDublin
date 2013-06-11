@@ -5,203 +5,199 @@ import ie.transportdublin.datastructure.mysql.Stop;
 import ie.transportdublin.datastructure.neo4j.RelationshipTypes;
 import ie.transportdublin.datastructure.neo4j.StopTime;
 import ie.transportdublin.datastructure.neo4j.Waypoint;
-
-import java.util.ArrayList;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import org.joda.time.DateTime;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.index.IndexService;
-import org.neo4j.index.lucene.LuceneFulltextQueryIndexService;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 
 public class SetupTimetableStep1 {
 
-	private static final String DB_PATH = "data/neo4j-db";
-	private static GraphDatabaseService graphDb;
-	private static IndexService index;
+    private static final String DB_PATH = "data/neo4j-db";
+    /**
+     * id: 1074700 - times: [(1,06:10:00), (1,06:35:00), (1,07:10:00),
+     * (1,07:45:00), (1,08:10:00), (2,08:30:00), (2,08:50:00), 09:20:00
+     */
+    static TreeMap<String, ArrayList<BusJourney>> routeToBusJourneyList;
+    /**
+     * id: 1074700 - times: [0, 15, 30, 45]
+     */
+    static TreeMap<String, ArrayList<Integer>> routeToTimeProgressionList;
+    static TreeMap<String, Stop> stopList;
+    static TreeMap<String, Waypoint> waypointList;
+    private static GraphDatabaseService graphDb;
+    private static IndexManager index;
 
-	/**
-	 * id: 1074700 - times: [(1,06:10:00), (1,06:35:00), (1,07:10:00),
-	 * (1,07:45:00), (1,08:10:00), (2,08:30:00), (2,08:50:00), 09:20:00
-	 */
-	static TreeMap<String, ArrayList<BusJourney>> routeToBusJourneyList;
-	/**
-	 * id: 1074700 - times: [0, 15, 30, 45]
-	 */
-	static TreeMap<String, ArrayList<Integer>> routeToTimeProgressionList;
+    public SetupTimetableStep1() {
 
-	static TreeMap<String, Stop> stopList;
+        super();
+        graphDb = new EmbeddedGraphDatabase(DB_PATH);
+//		index = new LuceneFulltextQueryIndexService(graphDb);
+        DatabaseHelper.setupDB();
 
-	static TreeMap<String, Waypoint> waypointList;
+        routeToBusJourneyList = DatabaseHelper.readTimetable();
+        routeToTimeProgressionList = DatabaseHelper.readAllStopTimes();
+        stopList = DatabaseHelper.readAllStops();
 
-	private static String convertToTripleDigit(int stopProgressionCounter) {
-		String tripleDigit;
-		if (stopProgressionCounter < 10) {
-			tripleDigit = "00" + stopProgressionCounter;
-		} else if (stopProgressionCounter < 100) {
-			tripleDigit = "0" + stopProgressionCounter;
-		} else {
-			tripleDigit = "" + stopProgressionCounter;
-		}
-		return tripleDigit;
-	}
+        waypointList = new TreeMap<String, Waypoint>();
+        setupStopsOnSameRoute();
 
-	public static void main(String[] args) {
+    }
 
-		SetupTimetableStep1 setupTimetable = new SetupTimetableStep1();
-		graphDb.shutdown();
-	}
+    private static String convertToTripleDigit(int stopProgressionCounter) {
+        String tripleDigit;
+        if (stopProgressionCounter < 10) {
+            tripleDigit = "00" + stopProgressionCounter;
+        } else if (stopProgressionCounter < 100) {
+            tripleDigit = "0" + stopProgressionCounter;
+        } else {
+            tripleDigit = "" + stopProgressionCounter;
+        }
+        return tripleDigit;
+    }
 
-	public SetupTimetableStep1() {
+    public static void main(String[] args) {
 
-		super();
-		graphDb = new EmbeddedGraphDatabase(DB_PATH);
-		index = new LuceneFulltextQueryIndexService(graphDb);
-		DatabaseHelper.setupDB();
+        SetupTimetableStep1 setupTimetable = new SetupTimetableStep1();
+        graphDb.shutdown();
+    }
 
-		routeToBusJourneyList = DatabaseHelper.readTimetable();
-		routeToTimeProgressionList = DatabaseHelper.readAllStopTimes();
-		stopList = DatabaseHelper.readAllStops();
+    /**
+     * Create Waypoint
+     *
+     * @param stop
+     * @return
+     */
+    private Waypoint createWaypoint(Stop stop) {
 
-		waypointList = new TreeMap<String, Waypoint>();
-		setupStopsOnSameRoute();
+        Waypoint waypoint = new Waypoint(graphDb, stop.getLatitude(), stop
+                .getLongitude(), stop.getStopID(), stop.getRouteID(), stop
+                .getStopName());
+        return waypoint;
+    }
 
-	}
+    private void setupStopsOnSameRoute() {
 
-	/**
-	 * Create Waypoint
-	 * @param stop
-	 * @return
-	 */
-	private Waypoint createWaypoint(Stop stop) {
+        Transaction tx = graphDb.beginTx();
+        int neoTransactionCounter = 0;
+        boolean setupReferenceNode = true;
 
-		Waypoint waypoint = new Waypoint(graphDb, stop.getLatitude(), stop
-				.getLongitude(), stop.getStopID(), stop.getRouteID(), stop
-				.getStopName());
-		return waypoint;
-	}
+        try {
 
-	private void setupStopsOnSameRoute() {
+            for (Entry<String, Stop> stopEntry : stopList.entrySet()) {
 
-		Transaction tx = graphDb.beginTx();
-		int neoTransactionCounter = 0;
-		boolean setupReferenceNode = true;
+                String stopid = stopEntry.getKey();
+                Stop stop = stopEntry.getValue();
+                Waypoint waypoint = createWaypoint(stop);
 
-		try {
+                // Setup reference node to first Waypoint
+                if (setupReferenceNode) {
+                    graphDb.getReferenceNode().createRelationshipTo(
+                            waypoint.getUnderlyingNode(),
+                            RelationshipTypes.REFERENCE);
+                    setupReferenceNode = false;
+                }
+                System.out.println(" NEW Waypoint " + stop.getStopID());
+                index.forNodes(ImportSpatialStopDataStep2.LAYER_NAME).add(waypoint.getUnderlyingNode(), Waypoint.STOPID,
+                        waypoint.getStopID());
+                waypointList.put(stopid, waypoint);
+                tx.success();
+                tx.finish();
+                tx = graphDb.beginTx();
+                if (++neoTransactionCounter % 10000 == 0) {
+                    // Commit the transaction every now and then
 
-			for (Entry<String, Stop> stopEntry : stopList.entrySet()) {
+                    System.out.println(" New transaction "
+                            + neoTransactionCounter);
+                    tx.success();
+                    tx.finish();
+                    tx = graphDb.beginTx();
+                }
+            }
 
-				String stopid = stopEntry.getKey();
-				Stop stop = stopEntry.getValue();
-				Waypoint waypoint = createWaypoint(stop);
+            // Every Route
+            for (Entry<String, ArrayList<BusJourney>> routeSqlEntry : routeToBusJourneyList
+                    .entrySet()) {
+                // Get all departure times
+                // [(1,06:10:00), (1,06:35:00), ...
 
-				// Setup reference node to first Waypoint
-				if (setupReferenceNode) {
-					graphDb.getReferenceNode().createRelationshipTo(
-							waypoint.getUnderlyingNode(),
-							RelationshipTypes.REFERENCE);
-					setupReferenceNode = false;
-				}
-				System.out.println(" NEW Waypoint " + stop.getStopID());
-				index.index(waypoint.getUnderlyingNode(), Waypoint.STOPID,
-						waypoint.getStopID());
-				waypointList.put(stopid, waypoint);
-				tx.success();
-				tx.finish();
-				tx = graphDb.beginTx();
-				if (++neoTransactionCounter % 10000 == 0) {
-					// Commit the transaction every now and then
+                ArrayList<BusJourney> routeToBusJourneysList = routeSqlEntry
+                        .getValue();
+                if (routeToBusJourneysList != null) {
+                    for (BusJourney busJourney : routeToBusJourneysList) {
+                        // (1,06:10:00)
 
-					System.out.println(" New transaction "
-							+ neoTransactionCounter);
-					tx.success();
-					tx.finish();
-					tx = graphDb.beginTx();
-				}
-			}
+                        int timeProgressionCounter = 1;
+                        int timeProgressionPrevious = 0;
+                        StopTime stopTimePrevious = null;
+                        for (Integer timeProgression : routeToTimeProgressionList
+                                .get(routeSqlEntry.getKey())) {
+                            DateTime progressionTime = busJourney.getTime()
+                                    .plusMinutes(timeProgression);
 
-			// Every Route
-			for (Entry<String, ArrayList<BusJourney>> routeSqlEntry : routeToBusJourneyList
-					.entrySet()) {
-				// Get all departure times
-				// [(1,06:10:00), (1,06:35:00), ...
+                            String stopid = routeSqlEntry.getKey()
+                                    + convertToTripleDigit(timeProgressionCounter);
+                            StopTime stopTime = setupStopTime(busJourney
+                                    .getDay(), progressionTime, stopid);
+                            index.forNodes(ImportSpatialStopDataStep2.LAYER_NAME).add(stopTime.getUnderlyingNode(),
+                                    StopTime.STOPTIMEID, stopTime
+                                    .getStopTimeID());
+                            if (timeProgressionCounter != 1) {
+                                int cost = (timeProgression - timeProgressionPrevious);
+                                stopTimePrevious.createBusTo(stopTime, cost);
+                                System.out.println(stopTimePrevious
+                                        .getStopTimeID()
+                                        + " -- " + cost + " -> " + stopTime);
+                            }
 
-				ArrayList<BusJourney> routeToBusJourneysList = routeSqlEntry
-						.getValue();
-				if (routeToBusJourneysList != null) {
-					for (BusJourney busJourney : routeToBusJourneysList) {
-						// (1,06:10:00)
+                            timeProgressionCounter++;
+                            timeProgressionPrevious = timeProgression;
+                            stopTimePrevious = stopTime;
 
-						int timeProgressionCounter = 1;
-						int timeProgressionPrevious = 0;
-						StopTime stopTimePrevious = null;
-						for (Integer timeProgression : routeToTimeProgressionList
-								.get(routeSqlEntry.getKey())) {
-							DateTime progressionTime = busJourney.getTime()
-									.plusMinutes(timeProgression);
+                            if (++neoTransactionCounter % 10000 == 0) {
+                                // Commit the transaction every now and then
 
-							String stopid = routeSqlEntry.getKey()
-									+ convertToTripleDigit(timeProgressionCounter);
-							StopTime stopTime = setupStopTime(busJourney
-									.getDay(), progressionTime, stopid);
-							index.index(stopTime.getUnderlyingNode(),
-									StopTime.STOPTIMEID, stopTime
-											.getStopTimeID());
-							if (timeProgressionCounter != 1) {
-								int cost = (timeProgression - timeProgressionPrevious);
-								stopTimePrevious.createBusTo(stopTime, cost);
-								System.out.println(stopTimePrevious
-										.getStopTimeID()
-										+ " -- " + cost + " -> " + stopTime);
-							}
+                                System.out.println(" New transaction "
+                                        + neoTransactionCounter);
+                                tx.success();
+                                tx.finish();
+                                tx = graphDb.beginTx();
+                            }
 
-							timeProgressionCounter++;
-							timeProgressionPrevious = timeProgression;
-							stopTimePrevious = stopTime;
+                        }
+                    }
+                }
+            }
+            tx.success();
+        } finally {
+            tx.finish();
+            graphDb.shutdown();
 
-							if (++neoTransactionCounter % 10000 == 0) {
-								// Commit the transaction every now and then
+        }
 
-								System.out.println(" New transaction "
-										+ neoTransactionCounter);
-								tx.success();
-								tx.finish();
-								tx = graphDb.beginTx();
-							}
+    }
 
-						}
-					}
-				}
-			}
-			tx.success();
-		} finally {
-			tx.finish();
-			graphDb.shutdown();
+    /**
+     * Create StopTime and link to parent Waypoint
+     *
+     * @param day
+     * @param progressionTime
+     * @param stopid
+     */
+    private StopTime setupStopTime(int day, DateTime progressionTime,
+                                   String stopid) {
+        Stop stop = stopList.get(stopid);
+        StopTime stopTime = new StopTime(graphDb, day, progressionTime, stopid,
+                stop.getLatitude(), stop.getLongitude());
+        Waypoint waypoint = waypointList.get(stopid);
+        waypoint.createConnectionTo(stopTime);
+        return stopTime;
 
-		}
-
-	}
-
-	/**
-	 * Create StopTime and link to parent Waypoint
-	 * 
-	 * @param day
-	 * @param progressionTime
-	 * @param stopid
-	 */
-	private StopTime setupStopTime(int day, DateTime progressionTime,
-			String stopid) {
-		Stop stop = stopList.get(stopid);
-		StopTime stopTime = new StopTime(graphDb, day, progressionTime, stopid,
-				stop.getLatitude(), stop.getLongitude());
-		Waypoint waypoint = waypointList.get(stopid);
-		waypoint.createConnectionTo(stopTime);
-		return stopTime;
-
-	}
+    }
 
 }

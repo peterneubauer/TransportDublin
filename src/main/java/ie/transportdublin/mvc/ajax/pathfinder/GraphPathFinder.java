@@ -16,7 +16,7 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Expander;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.index.IndexService;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.Traversal;
 
 
@@ -33,13 +33,13 @@ public class GraphPathFinder {
 	private static final CostEvaluator<Double> costEval = CommonEvaluators
 			.doubleCostEvaluator(Waypoint.COST);
 	private GraphDatabaseService graphDbService;
-	private IndexService indexService;
+	private IndexManager indexService;
 	public GraphPathFinder() {
 		super();
 	}
 
 	public GraphPathFinder(GraphDatabaseService graphDbService,
-			IndexService indexService) {
+			IndexManager indexService) {
 		this.graphDbService = graphDbService;
 		this.indexService = indexService;
 	}
